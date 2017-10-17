@@ -36,21 +36,19 @@ const getLast = (name: string): Measurement => {
   return measurements[name] && measurements[name][measurements[name].length - 1];
 };
 
-export const end = production
-  ? (): void => undefined
-  : (name: string, id?: number, log?: () => undefined): void => {
-      const started: Measurement = id
-        ? measurements[name].find((val: Measurement) => val.id === id)
-        : getLast(name);
+export const end = (name: string, id?: number, log?: () => undefined): void => {
+  const started: Measurement = id
+    ? measurements[name].find((val: Measurement) => val.id === id)
+    : getLast(name);
 
-      if (started && started.end === undefined) {
-        started.end = now();
-      }
+  if (started && started.end === undefined) {
+    started.end = now();
+  }
 
-      if (log) {
-        log();
-      }
-    };
+  if (log) {
+    log();
+  }
+};
 
 const addMeasurement = (name: string): Measurement => {
   const last = getLast(name);
@@ -60,27 +58,25 @@ const addMeasurement = (name: string): Measurement => {
   return newMeasurement;
 };
 
-export const start = production
-  ? (): (() => void) => (): void => {}
-  : (name: string, log?: () => void): (() => void) => {
-      let added: Measurement;
+export const start = (name: string, log?: () => void): (() => void) => {
+  let added: Measurement;
 
-      if (measurements.hasOwnProperty(name)) {
-        added = addMeasurement(name);
-      } else {
-        added = {
-          id: 1,
-          start: now(),
-        };
-        measurements[name] = [added];
-      }
-
-      if (log) {
-        log();
-      }
-
-      return () => end(name, added.id);
+  if (measurements.hasOwnProperty(name)) {
+    added = addMeasurement(name);
+  } else {
+    added = {
+      id: 1,
+      start: now(),
     };
+    measurements[name] = [added];
+  }
+
+  if (log) {
+    log();
+  }
+
+  return () => end(name, added.id);
+};
 
 const getEndedMeasurements = (values: MeasurementValues): EndedMeasurementValues =>
   values.filter(m => m.end) as EndedMeasurementValues;
@@ -100,7 +96,8 @@ const enhanceValues = (
   });
 
 const getMean = (values: EndedMeasurementValues): number =>
-  values.reduce((acc, { start, end }) => acc + (end - start), 0) / values.length;
+  values.reduce((acc, { start: startTime, end: endTime }) => acc + (endTime - startTime), 0) /
+  values.length;
 
 export const exportMeasurementsOf = (name: string): ExportedMeasurements | null => {
   if (!measurements.hasOwnProperty(name)) return null;
