@@ -27,8 +27,11 @@ export interface ExportedMeasurements {
   max: number;
   pending: number;
 }
+
+const isBrowser = typeof window !== 'undefined';
+
 const now: () => number =
-  window.performance && window.performance.now
+  isBrowser && window.performance && window.performance.now
     ? window.performance.now.bind(window.performance)
     : Date.now.bind(Date);
 
@@ -88,10 +91,10 @@ const enhanceValues = (
   values.map((val: Measurement & { end: number }, i: number) => {
     const duration = val.end - val.start;
     return {
-      ...val,
-      standardDeviation: Math.abs(mean - duration),
       duration,
+      standardDeviation: Math.abs(mean - duration),
       fromPrev: values[i - 1] ? duration - (values[i - 1].end - values[i - 1].start) : 0,
+      ...val,
     };
   });
 
