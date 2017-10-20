@@ -2,7 +2,7 @@
   "name": "measure-perf",
   "version": "0.1.0",
   "description": "Measure the execution time of a script in JS",
-  "main": "dist/template-ts.cjs.js",
+  "main": "dist/measure-perf.cjs.js",
   "module": "lib/index.js",
   "types": "lib/index.d.ts",
   "bugs": "https://github.com/matejlauko/measure-perf/issues",
